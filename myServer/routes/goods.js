@@ -63,5 +63,75 @@ router.get('/list',function (req,res,next){
         }
     })
 })
+router.post('/addCart',function(req,res,next){
+    let userId = '100000077';
+    let productId = req.body.productId;
+    let User = require('../models/user');
+    User.findOne({userId},function (err,userDoc){
+        if(err){
+            res.json({
+                status: "1",
+                msg:err.message
+            })
+        }else{
+            if(userDoc){
+                let goodsItem = '';
+                userDoc.cartList.forEach((item) => {
+                    if(item.productId == productId){
+                        goodsItem = item;
+                        item.productNum ++;
+                    }
+                })
+                if(goodsItem){
+                    userDoc.save(function(err2,doc){
+                        if(err2){
+                            res.json({
+                                status: "1",
+                                msg: err2.message
+                            })
+                        }else{
+                            res.json({
+                                status: '0',
+                                msg: '',
+                                result: 'suc'
+                            })
+                        }
+                    })
+                }else{
+                    Goods.findOne({productId},function(err,GoodsDoc){
+                        if(err){
+                            res.json({
+                                status: "1",
+                                msg:err.message
+                            })
+                        }else{
+                            if(GoodsDoc){
+                                GoodsDoc.productNum = 1;
+                                GoodsDoc.checked = 1;
+                                userDoc.cartList.push(GoodsDoc);
+                                userDoc.save(function(err2,doc){
+                                    if(err2){
+                                        res.json({
+                                            status: "1",
+                                            msg: err2.message
+                                        })
+                                    }else{
+                                        res.json({
+                                            status: '0',
+                                            msg: '',
+                                            result: 'suc'
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                    });
+                }
+                
+               
+            }
+        }
+    })
 
+})
 module.exports = router
