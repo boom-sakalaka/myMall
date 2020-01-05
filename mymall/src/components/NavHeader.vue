@@ -23,9 +23,9 @@
         <div class="navbar-right-container" style="display: flex;">
           <div class="navbar-menu-container">
             <!--<a href="/" class="navbar-link">我的账户</a>-->
-            <span class="navbar-link"></span>
-            <a href="javascript:void(0)" class="navbar-link" @click="loginModalFlag=true">Login</a>
-            <a href="javascript:void(0)" class="navbar-link" @click="loginModalFlag=false">Logout</a>
+            <span class="navbar-link" v-text="nikName" v-if="nikName"></span>
+            <a href="javascript:void(0)" class="navbar-link" @click="loginModalFlag=true" v-if="!nikName">Login</a>
+            <a href="javascript:void(0)" class="navbar-link" @click="logOut" v-if="nikName">Logout</a>
             <div class="navbar-cart-container">
               <span class="navbar-cart-count"></span>
               <a class="navbar-link navbar-cart-link" href="/#/cart">
@@ -42,7 +42,7 @@
           <div class="md-modal-inner">
             <div class="md-top">
               <div class="md-title">Login in</div>
-              <button class="md-close">Close</button>
+              <button class="md-close" @click="loginModalFlag=false">Close</button>
             </div>
             <div class="md-content">
               <div class="confirm-tips">
@@ -66,7 +66,7 @@
             </div>
           </div>
         </div>
-        <div class="md-overlay" v-if="loginModalFlag"></div>
+        <div class="md-overlay" v-if="loginModalFlag" @click="loginModalFlag=false"></div>
     </header>
 </template>
 
@@ -79,25 +79,52 @@ export default {
       userName: '',
       userPwd: '',
       errorTip:false,
-      loginModalFlag:false
+      loginModalFlag:false,
+      nikName:''
     }
   },
+  mounted(){
+    this.checkLogin()
+  },
   methods:{
+    checkLogin(){
+      axios.post("users/checkLogin").then((response)=> {
+        let res = response.data;
+        if(res.status == '0'){
+          this.nikName = res.result;
+        }
+      })
+    },
     login(){
+      if(!this.userName || !this.userPwd){
+        this.errorTip = true;
+        return;
+      }
       axios.post('/users/login',{
         userName:this.userName,
         userPwd:this.userPwd
       }).then((response) => {
-        // let res = response.data
-        // if(res.status == 0){
-        //   this.errorTip = false
-        //   //to-do
-        // }else{
-        //   this.errorTip = true
-        // }
+        let res = response.data
+        if(res.status == 0){
+          this.errorTip = false
+          this.nikName = res.result.userName
+          //to-do
+        }else{
+          this.errorTip = true
+        }
       })
 
       this.loginModalFlag =false
+    },
+    logOut(){
+      
+      axios.post('/users/logOut').then((response)=> {
+        let res = response.data;
+        if(res.status == '0'){
+          this.nikName = ''
+          alert(res.msg)
+        }
+      })
     }
   }
 }

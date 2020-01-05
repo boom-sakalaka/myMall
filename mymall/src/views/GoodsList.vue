@@ -166,7 +166,7 @@
             if(res.data.status == 0){
               alert('加入成功');
             }else{
-              alert('msg'+ res.msg);
+              alert(res.data.msg);
             }
           })
         }
