@@ -52,6 +52,28 @@
       </div>
     </div>
     <nav-footer></nav-footer>
+    <Modal :mdShow="mdShow" @close="closeModal">
+      <p slot="message">
+        请先登录，否则无法加入到购物车中！
+      </p>
+      <div slot="btnGroup">
+          <a href="javascript:;" class="btn btn--m" @click="mdShow = false">关闭</a>
+      </div>
+    </Modal>
+    <Modal :mdShow="mdShowCart" @close="closeModal">
+      <p slot="message">
+         <svg class="icon-status-ok">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-status-ok"></use>
+          </svg>
+          <span>加入购物车成功</span>
+      </p>
+      <div slot="btnGroup">
+          <a href="javascript:;" class="btn btn--m" @click="mdShowCart = false">继续购物</a>
+          <router-link href="javascript:;" class="btn btn--m" to="/cart">
+            查看购物车
+          </router-link>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -62,6 +84,7 @@
   import NavHeader from '@/components/NavHeader'
   import NavFooter from '@/components/NavFooter'
   import NavBread from '@/components/NavBread'
+  import Modal from '@/components/Modal'
   import axios from 'axios'
   export default {
     name: 'GoodsList',
@@ -93,13 +116,16 @@
         page:1,
         pageSize: 8,
         busy: true,
-        loading: false
+        loading: false,
+        mdShow: false,
+        mdShowCart: false
       }
     },
     components:{
         NavHeader,
         NavFooter,
-        NavBread
+        NavBread,
+        Modal
     },
     mounted: function () {
         this.getGoodsList();
@@ -143,6 +169,7 @@
         },
         chenckAllPrice(){
             this.priceChecked = 'all';
+            this.page = 1;
             this.filerBy = false;
             this.getGoodsList()
         },
@@ -164,11 +191,15 @@
         addCart(productId){
           axios.post('/goods/addCart',{productId}).then((res) => {
             if(res.data.status == 0){
-              alert('加入成功');
+              this.mdShowCart = true;
             }else{
-              alert(res.data.msg);
+              this.mdShow = true;
             }
           })
+        },
+        closeModal(){
+          this.mdShow = false;
+          this.mdShowCart = false;
         }
     }
   }
@@ -177,5 +208,8 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+ .btn:hover{
+   background-color: #ffe5e6;
+   transition: all .3s ease-out;
+ }
 </style>

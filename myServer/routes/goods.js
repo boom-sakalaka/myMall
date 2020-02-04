@@ -64,7 +64,7 @@ router.get('/list',function (req,res,next){
     })
 })
 router.post('/addCart',function(req,res,next){
-    let userId = '100000077';
+    let userId = req.cookies.userId;
     let productId = req.body.productId;
     let User = require('../models/user');
     User.findOne({userId},function (err,userDoc){
@@ -127,8 +127,6 @@ router.post('/addCart',function(req,res,next){
                         }
                     });
                 }
-                
-               
             }
         }
     })

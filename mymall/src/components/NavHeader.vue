@@ -108,6 +108,7 @@ export default {
         if(res.status == 0){
           this.errorTip = false
           this.nikName = res.result.userName
+          this.getCartCount();
           //to-do
         }else{
           this.errorTip = true
@@ -117,7 +118,6 @@ export default {
       this.loginModalFlag =false
     },
     logOut(){
-      
       axios.post('/users/logOut').then((response)=> {
         let res = response.data;
         if(res.status == '0'){
@@ -125,6 +125,12 @@ export default {
           alert(res.msg)
         }
       })
+    },
+    getCartCount(){
+          axios.get("/users/getCartCount").then((response)=>{
+              let res = response.data;
+              this.$store.commit("initCartCount",res.result);
+          });
     }
   }
 }
